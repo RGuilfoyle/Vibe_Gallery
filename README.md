@@ -11,6 +11,29 @@ This template equips you with a foundational React application integrated with A
 - **Authentication**: Setup with Amazon Cognito for secure user authentication.
 - **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
 - **Database**: Real-time database powered by Amazon DynamoDB.
+- **Node.js 22**: Configured to work with Node.js version 22.
+
+## Requirements
+
+- Node.js 22 or later
+- npm 10 or later
+
+## Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Deploy the backend:
+   ```bash
+   npx amplify deploy
+   ```
 
 ## Deploying to AWS
 
