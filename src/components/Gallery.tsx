@@ -1,17 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Gallery from 'react-photo-gallery';
-import { Photo } from 'react-photo-gallery';
 import { generateClient } from 'aws-amplify/data';
-import { fetchAuthSession } from 'aws-amplify/auth';
 import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '../../amplify/data/resource';
+
+// Define the Photo type that matches react-photo-gallery's requirements
+interface PhotoType {
+  src: string;
+  width: number;
+  height: number;
+  title?: string;
+  alt?: string;
+}
 
 interface PhotoGalleryProps {
   title?: string;
 }
 
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) => {
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<PhotoType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -38,12 +45,15 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
           const photosWithUrls = await Promise.all(
             response.data.map(async (photo) => {
               try {
+                if (!photo.s3Key) {
+                  return null;
+                }
+                
                 // Get the signed URL for the S3 object
                 const s3Response = await getUrl({
-                  key: photo.s3Key,
+                  path: photo.s3Key,
                   options: {
                     bucket: 'photo-gallery-storage-bucket',
-                    accessLevel: photo.isPublic ? 'public' : 'private',
                     validateObjectExistence: true,
                     expiresIn: 3600, // URL expires in 1 hour
                   }
@@ -64,7 +74,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
           );
           
           // Filter out any photos that failed to get URLs
-          setPhotos(photosWithUrls.filter(Boolean) as Photo[]);
+          setPhotos(photosWithUrls.filter(Boolean) as PhotoType[]);
         } catch (err) {
           console.error('Error fetching photos from database:', err);
           // Use sample photos as fallback
@@ -84,7 +94,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
     fetchPhotos();
   }, []);
 
-  const openLightbox = useCallback((event: React.MouseEvent, { photo, index }) => {
+  const openLightbox = useCallback((_: React.MouseEvent, { photo, index }: { photo: PhotoType; index: number }) => {
     // Implement lightbox functionality here if needed
     console.log('Opening photo:', photo, 'at index:', index);
   }, []);
@@ -110,7 +120,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
 };
 
 // Sample photos as fallback
-const samplePhotos: Photo[] = [
+const samplePhotos: PhotoType[] = [
   {
     src: 'https://source.unsplash.com/2ShvY8Lf6l0/800x599',
     width: 4,
