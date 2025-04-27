@@ -57,18 +57,22 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onUploadComplete }) => {
       
       // Upload file to S3
       await uploadData({
-        key,
+        path: key,
         data: file,
         options: {
           bucket: 'photo-gallery-storage-bucket',
-          onProgress: (progress) => {
-            // Handle progress updates safely
-            if (progress && typeof progress === 'object') {
-              setProgress(50); // Simple progress indication
-            }
+          onProgress: () => {
+            // Simple progress indication
+            setProgress((prev) => {
+              if (prev < 90) return prev + 10;
+              return prev;
+            });
           },
         },
       });
+      
+      // Set progress to 100% when upload is complete
+      setProgress(100);
       
       // Create image dimensions (you might want to use an actual image library to get real dimensions)
       // For now, we'll create a placeholder
