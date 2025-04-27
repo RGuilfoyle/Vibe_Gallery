@@ -23,42 +23,55 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
       try {
         setLoading(true);
         
+        // Check if the Photo model exists in the client
+        if (!client.models.Photo) {
+          console.warn('Photo model is not available yet. Using sample photos.');
+          setPhotos(samplePhotos);
+          return;
+        }
+        
         // Get photos from the database
-        const response = await client.models.Photo.list();
-        
-        // For each photo, get the S3 URL
-        const photosWithUrls = await Promise.all(
-          response.data.map(async (photo) => {
-            try {
-              // Get the signed URL for the S3 object
-              const s3Response = await getUrl({
-                key: photo.s3Key,
-                options: {
-                  bucket: 'photo-gallery-storage-bucket',
-                  accessLevel: photo.isPublic ? 'public' : 'private',
-                  validateObjectExistence: true,
-                  expiresIn: 3600, // URL expires in 1 hour
-                }
-              });
-              
-              return {
-                src: s3Response.url.toString(),
-                width: photo.width,
-                height: photo.height,
-                title: photo.title,
-                alt: photo.description || photo.title,
-              };
-            } catch (err) {
-              console.error(`Error getting URL for photo ${photo.id}:`, err);
-              return null;
-            }
-          })
-        );
-        
-        // Filter out any photos that failed to get URLs
-        setPhotos(photosWithUrls.filter(Boolean) as Photo[]);
+        try {
+          const response = await client.models.Photo.list();
+          
+          // For each photo, get the S3 URL
+          const photosWithUrls = await Promise.all(
+            response.data.map(async (photo) => {
+              try {
+                // Get the signed URL for the S3 object
+                const s3Response = await getUrl({
+                  key: photo.s3Key,
+                  options: {
+                    bucket: 'photo-gallery-storage-bucket',
+                    accessLevel: photo.isPublic ? 'public' : 'private',
+                    validateObjectExistence: true,
+                    expiresIn: 3600, // URL expires in 1 hour
+                  }
+                });
+                
+                return {
+                  src: s3Response.url.toString(),
+                  width: photo.width,
+                  height: photo.height,
+                  title: photo.title,
+                  alt: photo.description || photo.title,
+                };
+              } catch (err) {
+                console.error(`Error getting URL for photo ${photo.id}:`, err);
+                return null;
+              }
+            })
+          );
+          
+          // Filter out any photos that failed to get URLs
+          setPhotos(photosWithUrls.filter(Boolean) as Photo[]);
+        } catch (err) {
+          console.error('Error fetching photos from database:', err);
+          // Use sample photos as fallback
+          setPhotos(samplePhotos);
+        }
       } catch (err) {
-        console.error('Error fetching photos:', err);
+        console.error('Error in fetchPhotos:', err);
         setError('Failed to load photos. Please try again later.');
         
         // Use sample photos as fallback
@@ -129,9 +142,5 @@ const samplePhotos: Photo[] = [
     height: 3
   }
 ];
-
-export default PhotoGallery;
-
-export default PhotoGallery;
 
 export default PhotoGallery;

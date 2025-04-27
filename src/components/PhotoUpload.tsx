@@ -42,6 +42,12 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onUploadComplete }) => {
       setUploading(true);
       setError(null);
       
+      // Check if the Photo model exists in the client
+      if (!client.models.Photo) {
+        setError('Photo model is not available yet. Please deploy your backend first.');
+        return;
+      }
+      
       // Get current user
       const user = await getCurrentUser();
       
@@ -176,7 +182,5 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onUploadComplete }) => {
     </div>
   );
 };
-
-export default PhotoUpload;
 
 export default PhotoUpload;
