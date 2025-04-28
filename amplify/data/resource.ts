@@ -25,7 +25,7 @@ const schema = a.schema({
       allow.authenticated().to(['create', 'read']),
       // Allow owners to update and delete their photos
       allow.owner().to(['update', 'delete']),
-      // Allow guest access to photos marked as public
+      // Allow public access to read photos
       allow.publicApiKey().to(['read']),
     ]),
 });
@@ -36,7 +36,7 @@ export const data = defineData({
   schema,
   authorizationModes: {
     defaultAuthorizationMode: "apiKey",
-    // API Key is used for a.allow.public() rules
+    // API Key is used for allow.publicApiKey() rules
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
