@@ -16,9 +16,9 @@ const schema = a.schema({
       height: a.integer(),
       isPublic: a.boolean().default(false),
       owner: a.string(),
-      thumbnailKey: a.string().required(false), // S3 key for the thumbnail
-      thumbnailWidth: a.integer().required(false),
-      thumbnailHeight: a.integer().required(false),
+      thumbnailKey: a.string(), // S3 key for the thumbnail (optional by default)
+      thumbnailWidth: a.integer(),
+      thumbnailHeight: a.integer(),
     })
     .authorization((allow) => [
       // Allow authenticated users to create and read photos
