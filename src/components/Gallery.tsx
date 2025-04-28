@@ -11,6 +11,7 @@ interface PhotoType {
   height: number;
   title?: string;
   alt?: string;
+  thumbnailSrc?: string; // Added for thumbnails
 }
 
 interface PhotoGalleryProps {
@@ -59,12 +60,31 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
                   }
                 });
                 
+                // Get thumbnail URL if available
+                let thumbnailSrc = undefined;
+                if (photo.thumbnailKey) {
+                  try {
+                    const thumbnailResponse = await getUrl({
+                      path: photo.thumbnailKey,
+                      options: {
+                        bucket: 'photo-gallery-storage-bucket',
+                        validateObjectExistence: true,
+                        expiresIn: 3600,
+                      }
+                    });
+                    thumbnailSrc = thumbnailResponse.url.toString();
+                  } catch (thumbnailError) {
+                    console.warn(`Could not get thumbnail for ${photo.id}:`, thumbnailError);
+                  }
+                }
+                
                 return {
                   src: s3Response.url.toString(),
                   width: photo.width,
                   height: photo.height,
                   title: photo.title,
                   alt: photo.description || photo.title,
+                  thumbnailSrc: thumbnailSrc,
                 };
               } catch (err) {
                 console.error(`Error getting URL for photo ${photo.id}:`, err);
@@ -107,14 +127,34 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
     return <div className="error">{error}</div>;
   }
 
+  // Prepare photos for the album, using thumbnails for srcSet if available
+  const albumPhotos = photos.map(photo => ({
+    src: photo.src,
+    width: photo.width,
+    height: photo.height,
+    alt: photo.alt,
+    title: photo.title,
+    srcSet: photo.thumbnailSrc ? [
+      { src: photo.thumbnailSrc, width: 200, height: 200 }
+    ] : undefined,
+  }));
+
   return (
     <div className="photo-gallery-container">
       <h2>{title}</h2>
       {photos.length > 0 ? (
         <PhotoAlbum 
-          photos={photos} 
+          photos={albumPhotos} 
           layout="rows"
           onClick={({ photo, index }) => openLightbox(null, { photo, index })} 
+          sizes={{
+            size: "calc(100vw - 40px)",
+            sizes: [
+              { viewport: "(max-width: 640px)", size: "calc(100vw - 16px)" },
+              { viewport: "(max-width: 1200px)", size: "calc(100vw - 32px)" },
+              { viewport: "(max-width: 1600px)", size: "calc(100vw - 40px)" },
+            ],
+          }}
         />
       ) : (
         <p>No photos found. Add some photos to get started!</p>
