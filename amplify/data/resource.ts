@@ -26,7 +26,7 @@ const schema = a.schema({
       // Allow owners to update and delete their photos
       allow.owner().to(['update', 'delete']),
       // Allow guest access to photos marked as public
-      allow.guest().to(['read']),
+      allow.publicApiKey().to(['read']),
     ]),
 });
 
