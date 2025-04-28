@@ -17,7 +17,7 @@
     "aws-amplify": "^6.6.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-photo-gallery": "^8.0.0"
+    "react-photo-album": "^2.3.1"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.5.0",

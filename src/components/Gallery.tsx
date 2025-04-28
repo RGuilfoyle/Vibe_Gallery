@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Gallery from 'react-photo-gallery';
+import PhotoAlbum from 'react-photo-album';
 import { generateClient } from 'aws-amplify/data';
 import { getUrl } from 'aws-amplify/storage';
 import type { Schema } from '../../amplify/data/resource';
 
-// Define the Photo type that matches react-photo-gallery's requirements
+// Define the Photo type that matches react-photo-album's requirements
 interface PhotoType {
   src: string;
   width: number;
@@ -94,7 +94,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
     fetchPhotos();
   }, []);
 
-  const openLightbox = useCallback((_: React.MouseEvent, { photo, index }: { photo: PhotoType; index: number }) => {
+  const openLightbox = useCallback((_: React.MouseEvent | null, { photo, index }: { photo: PhotoType; index: number }) => {
     // Implement lightbox functionality here if needed
     console.log('Opening photo:', photo, 'at index:', index);
   }, []);
@@ -111,7 +111,11 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
     <div className="photo-gallery-container">
       <h2>{title}</h2>
       {photos.length > 0 ? (
-        <Gallery photos={photos} onClick={openLightbox} />
+        <PhotoAlbum 
+          photos={photos} 
+          layout="rows"
+          onClick={({ photo, index }) => openLightbox(null, { photo, index })} 
+        />
       ) : (
         <p>No photos found. Add some photos to get started!</p>
       )}
