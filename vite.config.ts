@@ -15,6 +15,16 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          amplify: ['aws-amplify', '@aws-amplify/ui-react'],
+          gallery: ['react-photo-album']
+        }
+      }
+    }
   },
   // Ensure development server works with Node.js 22
   server: {

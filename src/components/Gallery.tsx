@@ -92,7 +92,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
     };
     
     fetchPhotos();
-  }, []);
+  }, [client.models.Photo]);
 
   const openLightbox = useCallback((_: React.MouseEvent | null, { photo, index }: { photo: PhotoType; index: number }) => {
     // Implement lightbox functionality here if needed
