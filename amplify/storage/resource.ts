@@ -5,7 +5,7 @@ export const storage = defineStorage({
   name: 'photo-gallery-storage-bucket',
   access: (allow) => ({
     // Allow authenticated users to create, read, update, and delete their own content
-    authenticated: allow.userOwned().to(['create', 'read', 'update', 'delete']),
+    authenticated: allow.identities().to(['create', 'read', 'update', 'delete']),
     // Allow unauthenticated users to read public content
     public: allow.guest().to(['read']),
   }),
