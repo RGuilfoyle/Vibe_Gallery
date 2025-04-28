@@ -1,12 +1,8 @@
 import { useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
 import { Authenticator } from '@aws-amplify/ui-react';
 import PhotoGallery from "./components/Gallery";
 import PhotoUpload from "./components/PhotoUpload";
 import '@aws-amplify/ui-react/styles.css';
-
-const client = generateClient<Schema>();
 
 function App() {
   const [activeTab, setActiveTab] = useState<'gallery' | 'upload'>('gallery');
