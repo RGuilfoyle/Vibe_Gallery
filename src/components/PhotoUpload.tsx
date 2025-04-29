@@ -60,7 +60,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onUploadComplete }) => {
         path: key,
         data: file,
         options: {
-          bucket: 'photo-gallery-storage-bucket',
           onProgress: () => {
             // Simple progress indication
             setProgress((prev) => {

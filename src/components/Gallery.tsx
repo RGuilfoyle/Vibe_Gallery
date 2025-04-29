@@ -52,9 +52,8 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
                 
                 // Get the signed URL for the S3 object
                 const s3Response = await getUrl({
-                  path: photo.s3Key,
+                  path: `photos/${photo.s3Key.split('/').slice(1).join('/')}`,
                   options: {
-                    bucket: 'photo-gallery-storage-bucket',
                     validateObjectExistence: true,
                     expiresIn: 3600, // URL expires in 1 hour
                   }
@@ -65,9 +64,8 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ title = "Photo Gallery" }) 
                 if (photo.thumbnailKey) {
                   try {
                     const thumbnailResponse = await getUrl({
-                      path: photo.thumbnailKey,
+                      path: `photos/${photo.thumbnailKey.split('/').slice(1).join('/')}`,
                       options: {
-                        bucket: 'photo-gallery-storage-bucket',
                         validateObjectExistence: true,
                         expiresIn: 3600,
                       }
