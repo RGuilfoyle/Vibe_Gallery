@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Authenticator } from '@aws-amplify/ui-react';
-import PhotoGallery from "./components/Gallery";
-import PhotoUpload from "./components/PhotoUpload";
 import '@aws-amplify/ui-react/styles.css';
+
+// Lazy load components for better initial load performance
+const PhotoGallery = lazy(() => import("./components/Gallery"));
+const PhotoUpload = lazy(() => import("./components/PhotoUpload"));
 
 function App() {
   const [activeTab, setActiveTab] = useState<'gallery' | 'upload'>('gallery');
@@ -33,28 +35,32 @@ function App() {
             <button 
               className={activeTab === 'gallery' ? 'active' : ''} 
               onClick={() => setActiveTab('gallery')}
+              aria-pressed={activeTab === 'gallery'}
             >
               Photo Gallery
             </button>
             <button 
               className={activeTab === 'upload' ? 'active' : ''} 
               onClick={() => setActiveTab('upload')}
+              aria-pressed={activeTab === 'upload'}
             >
               Upload Photo
             </button>
           </div>
 
-          {activeTab === 'gallery' && (
-            <div className="gallery-container">
-              <PhotoGallery title="My Photos" key={refreshGallery} />
-            </div>
-          )}
-          
-          {activeTab === 'upload' && (
-            <div className="upload-container">
-              <PhotoUpload onUploadComplete={handleUploadComplete} />
-            </div>
-          )}
+          <Suspense fallback={<div className="loading">Loading...</div>}>
+            {activeTab === 'gallery' && (
+              <div className="gallery-container">
+                <PhotoGallery title="My Photos" key={refreshGallery} />
+              </div>
+            )}
+            
+            {activeTab === 'upload' && (
+              <div className="upload-container">
+                <PhotoUpload onUploadComplete={handleUploadComplete} />
+              </div>
+            )}
+          </Suspense>
         </main>
       )}
     </Authenticator>
